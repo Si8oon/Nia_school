@@ -1,0 +1,8 @@
+<h1>Add New Course</h1>
+<form method="POST">
+    Course Name: <input type="text" name="course_name" required><br><br>
+    Credit Hours: <input type="number" name="credit" min="1" value="1"><br><br>
+    <button type="submit">Add Course</button>
+</form>
+
+<a href="{{ url_for('show_courses') }}">Back to Course List</a>

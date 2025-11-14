@@ -1,0 +1,18 @@
+ <h1>Add New Student (Admin Only)</h1>
+    <form method="post" enctype="multipart/form-data">
+    First Name: <input type="text" name="first_name" required><br>
+    Second Name: <input type="text" name="second_name"><br>
+    Last Name: <input type="text" name="last_name" required><br>
+    Gender: 
+    <select name="gender" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+    </select><br>
+    Date of Birth: <input type="date" name="date_of_birth" required><br>
+    Grade Level: <input type="text" name="grade_level"><br>
+    Profile Picture: <input type="file" name="profile_pic" accept="image/*"><br>
+    <input type="submit" value="Add Student">
+</form>
+
+
+    <a href="{{ url_for('students') }}">Back to Student List</a>

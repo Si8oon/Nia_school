@@ -1,0 +1,13 @@
+<h1>All Courses</h1>
+<a href="{{ url_for('add_course') }}">Add Course</a>
+<ul>
+{% for c in courses %}
+   <li>
+      {{ c.course_name }} - {{ c.credit }} credit(s)
+      <form action="{{ url_for('delete_course', course_id=c.id) }}" method="post" style="display:inline;">
+          <button type="submit">Delete</button>
+      </form>
+   </li>
+{% endfor %}
+</ul>
+<a href="{{ url_for('home') }}">Back to Home</a>

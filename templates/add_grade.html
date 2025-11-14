@@ -1,0 +1,22 @@
+<h2>Add Grade</h2>
+<form method="post">
+    Student: 
+    <select name="student_id" required>
+        {% for s in students %}
+            <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
+        {% endfor %}
+    </select><br>
+
+    Course: 
+    <select name="course_id" required>
+        {% for c in courses %}
+            <option value="{{ c.id }}">{{ c.course_name }}</option>
+        {% endfor %}
+    </select><br>
+
+    Semester: <input type="text" name="semester" required><br>
+    Year: <input type="number" name="year" min="2000" max="2100" required><br>
+
+    <input type="submit" value="Add Grade">
+</form>
+<a href="{{ url_for('show_grades') }}">Back to Grades</a>

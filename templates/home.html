@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NiA School Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to NiA School</h1>
+
+    <h2>Quick Links</h2>
+    <ul>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('students') }}">All Students</a></li>
+        <li><a href="{{ url_for('show_teachers') }}">All Teachers</a></li>
+        <li><a href="{{ url_for('show_courses') }}">All Courses</a></li>
+        <li><a href="{{ url_for('grade_levels') }}">Grades by Level</a></li>
+    </ul>
+
+    <h2>Overview</h2>
+    <p>Total Students: {{ total_students }}</p>
+    <p>Total Teachers: {{ total_teachers }}</p>
+    <p>Total Courses: {{ total_courses }}</p>
+</body>
+</html>
