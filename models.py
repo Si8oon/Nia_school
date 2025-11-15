@@ -1,6 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
 db = SQLAlchemy()
 
 # ------------------- STUDENT -------------------
@@ -79,8 +82,16 @@ class Grade(db.Model):
         db.UniqueConstraint('student_id', 'course_id', name='student_course_uc'),
     )
 
-    def __repr__(self):
-        return (
-            f"<Grade Student:{self.student_id} "
-            f"Course:{self.course_id} {self.semester} {self.year}>"
-        )
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password_hash = db.Column(db.String(300), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default="student")  # roles: admin, teacher, student
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
