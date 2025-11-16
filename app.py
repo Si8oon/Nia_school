@@ -15,9 +15,7 @@ from functools import wraps
 
 app = Flask(__name__)
 
-# --------------------------
-# CONFIG
-# --------------------------
+#configgggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school_db.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -26,9 +24,8 @@ app.secret_key = "super_secret_key"
 
 db.init_app(app)
 
-# --------------------------
-# FLASK-LOGIN
-# --------------------------
+
+#flask-logiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -37,9 +34,7 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --------------------------
-# ROLES DECORATORS
-# --------------------------
+#rolessssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss decorator
 def role_required(role):
     def decorator(f):
         @wraps(f)
@@ -64,9 +59,8 @@ def roles_required(*roles):
         return decorated_function
     return decorator
 
-# --------------------------
-# HELPERS
-# --------------------------
+
+#helppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppper 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -81,9 +75,8 @@ def get_profile_pic_url(filename):
 def utility_processor():
     return dict(get_profile_pic_url=get_profile_pic_url)
 
-# --------------------------
-# AUTH ROUTES
-# --------------------------
+
+#Auth routeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -128,9 +121,9 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# --------------------------
-# HOME
-# --------------------------
+
+
+#homeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 @app.route('/')
 @login_required
 def home():
@@ -144,9 +137,7 @@ def home():
         total_courses=total_courses
     )
 
-# --------------------------
-# STUDENTS
-# --------------------------
+#studeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeetttttttttttttttttttttttttttttttttttttttttttttttttttttts
 @app.route('/students')
 @login_required
 def students():
@@ -211,9 +202,8 @@ def delete_student(student_id):
     db.session.commit()
     return redirect(url_for('students'))
 
-# --------------------------
-# TEACHERS
-# --------------------------
+
+#Teacherrrrrrrrrrrrrrrsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 @app.route('/teachers')
 @login_required
 def show_teachers():
@@ -255,9 +245,8 @@ def delete_teacher(teacher_id):
     db.session.commit()
     return redirect(url_for('show_teachers'))
 
-# --------------------------
-# COURSES
-# --------------------------
+
+#courseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 @app.route('/courses')
 @login_required
 def show_courses():
@@ -288,9 +277,8 @@ def delete_course(course_id):
     db.session.commit()
     return redirect(url_for('show_courses'))
 
-# --------------------------
-# GRADES
-# --------------------------
+
+#gradeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 @app.route('/grades')
 @login_required
 def show_grades():
@@ -334,7 +322,7 @@ def delete_grade(grade_id):
     db.session.commit()
     return redirect(url_for('show_grades'))
 
-#gradddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+#graddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddee
 @app.route('/grade_levels')
 @login_required
 def grade_levels():
@@ -348,9 +336,7 @@ def students_by_grade(grade_level):
     students = Student.query.filter_by(grade_level=grade_level).all()
     return render_template('students_by_grade.html', grade_level=grade_level, students=students)
 
-# --------------------------
-# RUN
-# --------------------------
+#runnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 if __name__ == "__main__":
     with app.app_context():
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
