@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Grade Levels</title>
-</head>
-<body>
-    <h1>Grade Levels</h1>
-    <ul>
-        {% for grade in grades %}
-            <li>
-                <a href="{{ url_for('students_by_grade', grade_level=grade) }}">
-                    Grade {{ grade }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Grade Levels</h1>
+
+<ul>
+    {% for grade in grades %}
+        <li>
+            <a href="{{ url_for('students_by_grade', grade_level=grade) }}">
+                Grade {{ grade }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+
+<p>
     <a href="{{ url_for('home') }}">Back to Home</a>
-</body>
-</html>
+</p>
+{% endblock %}

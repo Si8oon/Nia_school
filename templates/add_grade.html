@@ -1,22 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h2>Add Grade</h2>
-<form method="post">
-    Student: 
-    <select name="student_id" required>
-        {% for s in students %}
-            <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
-        {% endfor %}
-    </select><br>
 
-    Course: 
-    <select name="course_id" required>
-        {% for c in courses %}
-            <option value="{{ c.id }}">{{ c.course_name }}</option>
-        {% endfor %}
-    </select><br>
+<form method="post" action="{{ url_for('add_grade') }}">
+    <p>
+        <label>Student:</label>
+        <select name="student_id" required>
+            {% for s in students %}
+                <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
+            {% endfor %}
+        </select>
+    </p>
 
-    Semester: <input type="text" name="semester" required><br>
-    Year: <input type="number" name="year" min="2000" max="2100" required><br>
+    <p>
+        <label>Course:</label>
+        <select name="course_id" required>
+            {% for c in courses %}
+                <option value="{{ c.id }}">{{ c.course_name }}</option>
+            {% endfor %}
+        </select>
+    </p>
 
-    <input type="submit" value="Add Grade">
+    <p>
+        <label>Semester:</label>
+        <input type="text" name="semester" required>
+    </p>
+
+    <p>
+        <label>Year:</label>
+        <input type="number" name="year" min="2000" max="2100" required>
+    </p>
+
+    <p>
+        <button type="submit">Add Grade</button>
+    </p>
 </form>
-<a href="{{ url_for('show_grades') }}">Back to Grades</a>
+
+<p>
+    <a href="{{ url_for('show_grades') }}">Back to Grades</a>
+</p>
+{% endblock %}

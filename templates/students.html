@@ -1,6 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h1>All Students</h1>
-<a href="{{ url_for('add_student') }}">Add Student</a>
-<ul>
+
+<input type="text" id="searchInput" placeholder="Search students...">
+
+<p>
+    <a href="{{ url_for('add_student') }}">Add Student</a>
+</p>
+
+<ul id="studentsList">
 {% for s in students %}
    <li>
       {{ s.first_name }} {{ s.last_name }} - {{ s.gender }}
@@ -10,4 +19,13 @@
    </li>
 {% endfor %}
 </ul>
-<a href="{{ url_for('home') }}">Back to Home</a>
+
+<p>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</p>
+
+<script src="{{url_for('static',filename='js/logic.js')}}">
+
+</script>
+
+{% endblock %}

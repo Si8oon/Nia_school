@@ -1,32 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h1>All Grades</h1>
 
-<a href="{{ url_for('add_grade') }}">➕ Add Grade</a>
+<input type="text" id="searchInput" placeholder="Search grades...">
 
-<br><br>
+<p>
+    <a href="{{ url_for('add_grade') }}">➕ Add Grade</a>
+</p>
 
 {% if grades %}
-    <ul>
+<table id="gradesTable" border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Course</th>
+            <th>Semester</th>
+            <th>Year</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
     {% for g in grades %}
-        <li style="margin-bottom: 10px;">
-            <strong>{{ g.student_obj.first_name }} {{ g.student_obj.last_name }}</strong>
-            —
-            {{ g.course_obj.course_name }}
-            —
-            {{ g.semester }} {{ g.year }}
-
-            <form action="{{ url_for('delete_grade', grade_id=g.id) }}"
-                  method="post"
-                  style="display:inline;">
-                <button type="submit" style="margin-left: 10px;">
-                    Delete
-                </button>
-            </form>
-        </li>
+        <tr>
+            <td>{{ g.student_obj.first_name }} {{ g.student_obj.last_name }}</td>
+            <td>{{ g.course_obj.course_name }}</td>
+            <td>{{ g.semester }}</td>
+            <td>{{ g.year }}</td>
+            <td>
+                <form action="{{ url_for('delete_grade', grade_id=g.id) }}" method="post" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
     {% endfor %}
-    </ul>
+    </tbody>
+</table>
 {% else %}
-    <p>No grades recorded yet.</p>
+<p>No grades recorded yet.</p>
 {% endif %}
 
-<br>
-<a href="{{ url_for('home') }}">🏠 Back to Home</a>
+<p>
+    <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+</p>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const table = document.getElementById('gradesTable');
+if (table) {
+    const rows = Array.from(table.getElementsByTagName('tr')).slice(1); // skip header
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase();
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+}
+</script>
+
+{% endblock %}

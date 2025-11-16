@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or "NiA School Dashboard" }}</title>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">NiA School</div>
+            <nav class="navbar">
+                <ul>
+                    <li>
+                        <a href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="{{ url_for('students') }}">Students</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('show_teachers') }}">Teachers</a>
+                    </li>
+                    
+                    <li>
+                        <a href="{{ url_for('show_courses') }}">Courses</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('grade_levels') }}">Grade Levels</a>
+                    </li>
+                    
+                    <li>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <main class="main">
+    {% block content %}
+    {% endblock %}
+</main>
+
+        
+        <footer>
+             &copy; {{ year or 2025 }} — NiA School
+        </footer>
+    
+
+</div>
+
+</body>
+</html>

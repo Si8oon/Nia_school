@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h1>Students in Grade {{ grade_level }}</h1>
 
 <div style="display: flex; flex-wrap: wrap; gap: 20px;">
@@ -17,5 +20,8 @@
     {% endfor %}
 </div>
 
-<a href="{{ url_for('grade_levels') }}">Back to Grade Levels</a>
-<a href="{{ url_for('home') }}">Back to Home</a>
+<p>
+    <a href="{{ url_for('grade_levels') }}">Back to Grade Levels</a> |
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</p>
+{% endblock %}
