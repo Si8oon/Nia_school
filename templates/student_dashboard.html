@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Dashboard</h1>
+
+<div class="welcome-section">
+    <h2>Welcome, {{ student.first_name }}!</h2>
+    <p>You are logged in as a student in Grade {{ student.grade_level }}</p>
+</div>
+
+<div class="quick-actions">
+    <h3>Quick Actions</h3>
+    <p>
+        <a href="{{ url_for('my_profile') }}" class="button-link">View My Profile</a>
+        <a href="#" class="button-link">View My Grades</a>
+        <a href="#" class="button-link">My Courses</a>
+    </p>
+</div>
+
+<div class="recent-grades">
+    <h3>My Grades</h3>
+    {% if grades %}
+    <table>
+        <thead>
+            <tr>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.course_obj.course_name }}</td>
+                <td>{{ grade.semester }}</td>
+                <td>{{ grade.year }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No grades found.</p>
+    {% endif %}
+</div>
+{% endblock %}
