@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ "NiA School Dashboard" }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 <body>
-
     <div class="container">
         <header class="header">
             <div class="logo">NiA School</div>
@@ -18,21 +16,37 @@
                         <a href="{{ url_for('home') }}">Home</a>
                     </li>
                     
+                    {% if current_user.role in ['admin', 'teacher'] %}
                     <li>
                         <a href="{{ url_for('students') }}">Students</a>
                     </li>
+                    {% else %}
+                    <li>
+                        <a href="{{ url_for('my_profile') }}">My Profile</a>
+                    </li>
+                    {% endif %}
 
+                    {% if current_user.role in ['admin', 'teacher'] %}
                     <li>
                         <a href="{{ url_for('show_teachers') }}">Teachers</a>
                     </li>
+                    {% endif %}
                     
                     <li>
                         <a href="{{ url_for('show_courses') }}">Courses</a>
                     </li>
 
+                    {% if current_user.role in ['admin', 'teacher'] %}
                     <li>
                         <a href="{{ url_for('grade_levels') }}">Grade Levels</a>
                     </li>
+                    {% endif %}
+
+                    {% if current_user.role == 'student' %}
+                    <li>
+                        <a href="{{ url_for('my_grades') }}">My Grades</a>
+                    </li>
+                    {% endif %}
                     
                     <li>
                         <a href="{{ url_for('logout') }}">Logout</a>
@@ -40,18 +54,15 @@
                 </ul>
             </nav>
         </header>
+        
         <main class="main">
-    {% block content %}
-    {% endblock %}
-</main>
-
+            {% block content %}
+            {% endblock %}
+        </main>
         
         <footer>
-             &copy; {{ year or 2025 }} — NiA School
+            &copy; {{ year or 2025 }} — NiA School
         </footer>
-    
-
-</div>
-
+    </div>
 </body>
 </html>

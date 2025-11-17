@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-section">
+    <div class="section-header">
+        <h2>My Grades</h2>
+        <p>Academic performance for {{ student.first_name }} {{ student.last_name }}</p>
+    </div>
+    
+    {% if grades %}
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Semester</th>
+                    <th>Academic Year</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr>
+                    <td>{{ grade.course_obj.course_name }}</td>
+                    <td>{{ grade.semester }}</td>
+                    <td>{{ grade.year }}</td>
+                    <td>
+                        <span class="status-badge status-active">Enrolled</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No grades recorded yet.</p>
+        <p>Please check back later or contact your teacher.</p>
+    </div>
+    {% endif %}
+    
+    <div class="action-buttons">
+        <a href="{{ url_for('my_profile') }}" class="btn btn-secondary">Back to Profile</a>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

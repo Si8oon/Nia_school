@@ -2,25 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up</title>
+    <title>Student Sign Up - NiA School</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .file-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Create Account</h2>
-    <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+    <h2>Create Student Account</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-section">
+            <h3>Account Information</h3>
+            <label>Username:</label>
+            <input type="text" name="username" required>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+        </div>
 
-        <label>Role:</label><br>
-        <select name="role" required>
-            <option value="student" selected>Student</option>
-            <option value="teacher">Teacher</option>
-            <option value="admin">Admin</option>
-        </select><br><br>
+        <div class="form-section">
+            <h3>Personal Information</h3>
+            <label>First Name:</label>
+            <input type="text" name="first_name" required>
 
-        <button type="submit">Sign Up</button>
+            <label>Last Name:</label>
+            <input type="text" name="last_name" required>
+
+            <label>Second Name (Optional):</label>
+            <input type="text" name="second_name">
+
+            <label>Gender:</label>
+            <select name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label>Date of Birth:</label>
+            <input type="date" name="date_of_birth" required>
+
+            <label>Grade Level:</label>
+            <select name="grade_level" required>
+                <option value="Grade 9">Grade 9</option>
+                <option value="Grade 10">Grade 10</option>
+                <option value="Grade 11">Grade 11</option>
+                <option value="Grade 12">Grade 12</option>
+            </select>
+        </div>
+
+        <div class="form-section">
+            <h3>Profile Picture</h3>
+            <label>Upload Profile Picture:</label>
+            <input type="file" name="profile_pic" accept="image/*">
+            <div class="file-info">
+                Allowed formats: JPG, PNG, GIF (Max: 16MB)
+            </div>
+        </div>
+
+        <!-- No role selection - automatically set as student -->
+        <input type="hidden" name="role" value="student">
+
+        <button type="submit">Sign Up as Student</button>
     </form>
     <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
 </body>

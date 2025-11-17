@@ -15,7 +15,7 @@ from functools import wraps
 
 app = Flask(__name__)
 
-#configgggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
+# Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school_db.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -24,8 +24,7 @@ app.secret_key = "super_secret_key"
 
 db.init_app(app)
 
-
-#flask-logiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+# Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
@@ -34,7 +33,7 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-#rolessssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss decorator
+# Role decorators
 def role_required(role):
     def decorator(f):
         @wraps(f)
@@ -59,8 +58,7 @@ def roles_required(*roles):
         return decorated_function
     return decorator
 
-
-#helppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppper 
+# Helper functions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -75,28 +73,67 @@ def get_profile_pic_url(filename):
 def utility_processor():
     return dict(get_profile_pic_url=get_profile_pic_url)
 
-
-#Auth routeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        role = request.form['role']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        second_name = request.form.get('second_name')
+        gender = request.form['gender']
+        dob_str = request.form['date_of_birth']
+        grade_level = request.form['grade_level']
+        
+        # Force all public signups to be students only
+        role = 'student'
 
+        # Check if username already exists
         if User.query.filter_by(username=username).first():
             return "Username already taken", 400
 
+        # Handle profile picture upload
+        profile_file = request.files.get('profile_pic')
+        filename = None
+
+        if profile_file and profile_file.filename:
+            if allowed_file(profile_file.filename):
+                # Generate unique filename
+                ext = profile_file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"{uuid.uuid4()}.{ext}"
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                profile_file.save(file_path)
+                filename = unique_filename
+            else:
+                return "Invalid file type. Please upload JPG, PNG, or GIF images.", 400
+
+        # Convert date string to datetime
+        dob = datetime.datetime.strptime(dob_str, '%Y-%m-%d')
+
+        # Create the user
         new_user = User(username=username, role=role)
         new_user.set_password(password)
-
         db.session.add(new_user)
+        db.session.flush()  # Get the user ID
+
+        # Create student profile with provided information
+        student = Student(
+            first_name=first_name,
+            last_name=last_name,
+            second_name=second_name,
+            gender=gender,
+            date_of_birth=dob,
+            grade_level=grade_level,
+            profile_pic=filename,  # Save the profile picture filename
+            user_id=new_user.id   # Link to the user
+        )
+        db.session.add(student)
         db.session.commit()
 
         return redirect(url_for('login'))
 
     return render_template("signup.html")
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -114,16 +151,13 @@ def login():
 
     return render_template("login.html")
 
-
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
-
-#homeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+# Home - accessible to all authenticated users
 @app.route('/')
 @login_required
 def home():
@@ -137,10 +171,19 @@ def home():
         total_courses=total_courses
     )
 
-#studeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeetttttttttttttttttttttttttttttttttttttttttttttttttttttts
+# Student routes
 @app.route('/students')
 @login_required
 def students():
+    # Students can only see their own profile
+    if current_user.role == 'student':
+        student = Student.query.filter_by(user_id=current_user.id).first()
+        if student:
+            return render_template('student_profile.html', student=student)
+        else:
+            return "Student profile not found. Please contact administrator.", 404
+    
+    # Admins and teachers can see all students
     students = Student.query.all()
     return render_template('students.html', students=students)
 
@@ -149,6 +192,8 @@ def students():
 @roles_required('admin', 'teacher')
 def add_student():
     courses = Course.query.all()
+    users = User.query.filter_by(role='student', student=None).all()  # Users without student profiles
+    
     if request.method == 'POST':
         first = request.form['first_name']
         second = request.form.get('second_name')
@@ -156,6 +201,7 @@ def add_student():
         gender = request.form['gender']
         dob_str = request.form['date_of_birth']
         grade_level = request.form['grade_level']
+        user_id = request.form.get('user_id')
 
         if not first or not last or not dob_str:
             return "Missing required fields", 400
@@ -180,14 +226,15 @@ def add_student():
             gender=gender,
             date_of_birth=dob,
             grade_level=grade_level,
-            profile_pic=filename
+            profile_pic=filename,
+            user_id=user_id if user_id else None
         )
 
         db.session.add(student)
         db.session.commit()
         return redirect(url_for('students'))
 
-    return render_template('add_student.html', courses=courses)
+    return render_template('add_student.html', courses=courses, users=users)
 
 @app.route('/delete_student/<int:student_id>', methods=['POST'])
 @login_required
@@ -202,18 +249,53 @@ def delete_student(student_id):
     db.session.commit()
     return redirect(url_for('students'))
 
+# Student-specific routes
+@app.route('/my_profile')
+@login_required
+@role_required('student')
+def my_profile():
+    student = Student.query.filter_by(user_id=current_user.id).first()
+    if not student:
+        return "Student profile not found. Please contact administrator.", 404
+    return render_template('student_profile.html', student=student)
 
-#Teacherrrrrrrrrrrrrrrsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+@app.route('/my_grades')
+@login_required
+@role_required('student')
+def my_grades():
+    student = Student.query.filter_by(user_id=current_user.id).first()
+    if not student:
+        return "Student profile not found. Please contact administrator.", 404
+    
+    grades = Grade.query.filter_by(student_id=student.id).all()
+    return render_template('student_grades.html', student=student, grades=grades)
+
+@app.route('/my_courses')
+@login_required
+@role_required('student')
+def my_courses():
+    student = Student.query.filter_by(user_id=current_user.id).first()
+    if not student:
+        return "Student profile not found. Please contact administrator.", 404
+    
+    grades = Grade.query.filter_by(student_id=student.id).all()
+    courses = [grade.course_obj for grade in grades]
+    return render_template('student_courses.html', student=student, courses=courses)
+
+# Teacher routes
 @app.route('/teachers')
 @login_required
+@roles_required('admin', 'teacher')
 def show_teachers():
     teachers = Teacher.query.all()
     return render_template('teachers.html', teachers=teachers)
 
 @app.route('/add_teacher', methods=['GET', 'POST'])
 @login_required
-@roles_required('admin')
+@role_required('admin')
 def add_teacher():
+    users = User.query.filter_by(role='teacher', teacher=None).all()  # Users without teacher profiles
+    
     if request.method == "POST":
         first = request.form['first_name']
         second = request.form.get('second_name')
@@ -221,6 +303,7 @@ def add_teacher():
         gender = request.form['gender']
         department = request.form.get('department')
         hire_date = datetime.datetime.strptime(request.form['hire_date'], '%Y-%m-%d')
+        user_id = request.form.get('user_id')
 
         teacher = Teacher(
             first_name=first,
@@ -228,13 +311,14 @@ def add_teacher():
             last_name=last,
             gender=gender,
             department=department,
-            hire_date=hire_date
+            hire_date=hire_date,
+            user_id=user_id if user_id else None
         )
         db.session.add(teacher)
         db.session.commit()
         return redirect(url_for('show_teachers'))
 
-    return render_template('add_teacher.html')
+    return render_template('add_teacher.html', users=users)
 
 @app.route('/delete_teacher/<int:teacher_id>', methods=['POST'])
 @login_required
@@ -245,10 +329,10 @@ def delete_teacher(teacher_id):
     db.session.commit()
     return redirect(url_for('show_teachers'))
 
-
-#courseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+# Course routes
 @app.route('/courses')
 @login_required
+@roles_required('admin', 'teacher', 'student')
 def show_courses():
     courses = Course.query.all()
     return render_template('courses.html', courses=courses)
@@ -277,10 +361,10 @@ def delete_course(course_id):
     db.session.commit()
     return redirect(url_for('show_courses'))
 
-
-#gradeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+# Grade routes
 @app.route('/grades')
 @login_required
+@roles_required('admin', 'teacher')
 def show_grades():
     grades = Grade.query.all()
     return render_template('grades.html', grades=grades)
@@ -322,9 +406,10 @@ def delete_grade(grade_id):
     db.session.commit()
     return redirect(url_for('show_grades'))
 
-#graddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddee
+# Grade levels
 @app.route('/grade_levels')
 @login_required
+@roles_required('admin', 'teacher')
 def grade_levels():
     grades = db.session.query(Student.grade_level).distinct().all()
     grades = [g[0] for g in grades if g[0]]
@@ -332,11 +417,20 @@ def grade_levels():
 
 @app.route('/students_by_grade/<grade_level>')
 @login_required
+@roles_required('admin', 'teacher')
 def students_by_grade(grade_level):
     students = Student.query.filter_by(grade_level=grade_level).all()
     return render_template('students_by_grade.html', grade_level=grade_level, students=students)
 
-#runnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+# Error handlers
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template('403.html'), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
 if __name__ == "__main__":
     with app.app_context():
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
