@@ -1,23 +1,145 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Welcome to NiA School Dashboard</h1>
+<div class="dashboard-section">
+    <div class="welcome-header">
+        <h1>Welcome to NiA School Dashboard</h1>
+        <p class="welcome-subtitle">Manage your educational institution with ease and efficiency</p>
+    </div>
 
-<section>
-    <h2>Quick Links</h2>
-    <ul>
-        <li><a href="{{ url_for('home') }}">Home</a></li>
-        <li><a href="{{ url_for('students') }}">All Students</a></li>
-        <li><a href="{{ url_for('show_teachers') }}">All Teachers</a></li>
-        <li><a href="{{ url_for('show_courses') }}">All Courses</a></li>
-        <li><a href="{{ url_for('grade_levels') }}">Grades by Level</a></li>
-    </ul>
-</section>
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_students }}</h3>
+                <p>Total Students</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_teachers }}</h3>
+                <p>Total Teachers</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_courses }}</h3>
+                <p>Total Courses</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_students + total_teachers }}</h3>
+                <p>Total Community</p>
+            </div>
+        </div>
+    </div>
 
-<section>
-    <h2>Overview</h2>
-    <p>Total Students: {{ total_students }}</p>
-    <p>Total Teachers: {{ total_teachers }}</p>
-    <p>Total Courses: {{ total_courses }}</p>
-</section>
+    <!-- Quick Actions Grid -->
+    <div class="actions-section">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="{{ url_for('students') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3>Manage Students</h3>
+                <p>View, add, and manage student records</p>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{{ url_for('show_teachers') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3>Teacher Directory</h3>
+                <p>Access teacher information and profiles</p>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{{ url_for('show_courses') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Course Catalog</h3>
+                <p>Browse and manage course offerings</p>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{{ url_for('grade_levels') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3>Grade Levels</h3>
+                <p>Organize students by grade levels</p>
+                <span class="action-arrow">→</span>
+            </a>
+
+            {% if current_user.role in ['admin', 'teacher'] %}
+            <a href="{{ url_for('add_student') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>Add Student</h3>
+                <p>Register new students to the system</p>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{{ url_for('add_course') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h3>Add Course</h3>
+                <p>Create new course offerings</p>
+                <span class="action-arrow">→</span>
+            </a>
+            {% endif %}
+
+            {% if current_user.role == 'student' %}
+            <a href="{{ url_for('my_profile') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>My Profile</h3>
+                <p>View and manage your personal information</p>
+                <span class="action-arrow">→</span>
+            </a>
+            
+            <a href="{{ url_for('my_grades') }}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>My Grades</h3>
+                <p>Check your academic performance</p>
+                <span class="action-arrow">→</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Activity (Placeholder for future features) -->
+    <div class="activity-section">
+        <h2>Recent Activity</h2>
+        <div class="activity-placeholder">
+            <i class="fas fa-chart-bar"></i>
+            <p>Activity dashboard coming soon...</p>
+            <small>Track recent changes, new enrollments, and system updates</small>
+        </div>
+    </div>
+</div>
 {% endblock %}

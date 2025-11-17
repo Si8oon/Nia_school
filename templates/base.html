@@ -3,54 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ "NiA School Dashboard" }}</title>
+    <title>NiA School Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <div class="logo">NiA School</div>
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                NiA School
+            </div>
+            
+            <!-- Desktop Navigation -->
             <nav class="navbar">
                 <ul>
-                    <li>
-                        <a href="{{ url_for('home') }}">Home</a>
-                    </li>
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
                     
                     {% if current_user.role in ['admin', 'teacher'] %}
-                    <li>
-                        <a href="{{ url_for('students') }}">Students</a>
-                    </li>
+                    <li><a href="{{ url_for('students') }}"><i class="fas fa-users"></i> Students</a></li>
                     {% else %}
-                    <li>
-                        <a href="{{ url_for('my_profile') }}">My Profile</a>
-                    </li>
+                    <li><a href="{{ url_for('my_profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
                     {% endif %}
 
                     {% if current_user.role in ['admin', 'teacher'] %}
-                    <li>
-                        <a href="{{ url_for('show_teachers') }}">Teachers</a>
-                    </li>
+                    <li><a href="{{ url_for('show_teachers') }}"><i class="fas fa-chalkboard-teacher"></i> Teachers</a></li>
                     {% endif %}
                     
-                    <li>
-                        <a href="{{ url_for('show_courses') }}">Courses</a>
-                    </li>
+                    <li><a href="{{ url_for('show_courses') }}"><i class="fas fa-book"></i> Courses</a></li>
 
                     {% if current_user.role in ['admin', 'teacher'] %}
-                    <li>
-                        <a href="{{ url_for('grade_levels') }}">Grade Levels</a>
-                    </li>
+                    <li><a href="{{ url_for('grade_levels') }}"><i class="fas fa-layer-group"></i> Grade Levels</a></li>
                     {% endif %}
 
                     {% if current_user.role == 'student' %}
-                    <li>
-                        <a href="{{ url_for('my_grades') }}">My Grades</a>
-                    </li>
+                    <li><a href="{{ url_for('my_grades') }}"><i class="fas fa-chart-bar"></i> My Grades</a></li>
                     {% endif %}
                     
-                    <li>
-                        <a href="{{ url_for('logout') }}">Logout</a>
-                    </li>
+                    <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Mobile Navigation -->
+            <nav class="mobile-nav" id="mobileNav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
+                    
+                    {% if current_user.role in ['admin', 'teacher'] %}
+                    <li><a href="{{ url_for('students') }}"><i class="fas fa-users"></i> Students</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('my_profile') }}"><i class="fas fa-user"></i> My Profile</a></li>
+                    {% endif %}
+
+                    {% if current_user.role in ['admin', 'teacher'] %}
+                    <li><a href="{{ url_for('show_teachers') }}"><i class="fas fa-chalkboard-teacher"></i> Teachers</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{{ url_for('show_courses') }}"><i class="fas fa-book"></i> Courses</a></li>
+
+                    {% if current_user.role in ['admin', 'teacher'] %}
+                    <li><a href="{{ url_for('grade_levels') }}"><i class="fas fa-layer-group"></i> Grade Levels</a></li>
+                    {% endif %}
+
+                    {% if current_user.role == 'student' %}
+                    <li><a href="{{ url_for('my_grades') }}"><i class="fas fa-chart-bar"></i> My Grades</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </nav>
         </header>
@@ -61,8 +87,45 @@
         </main>
         
         <footer>
-            &copy; {{ year or 2025 }} — NiA School
+            <i class="fas fa-copyright"></i> {{ year or 2025 }} — NiA School Management System
         </footer>
     </div>
+
+    <script>
+        // Hamburger menu functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileNav = document.getElementById('mobileNav');
+
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideHeader = event.target.closest('.header');
+            if (!isClickInsideHeader && mobileNav.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        const mobileLinks = document.querySelectorAll('.mobile-nav a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

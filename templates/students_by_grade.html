@@ -1,27 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Students in Grade {{ grade_level }}</h1>
-
-<div style="display: flex; flex-wrap: wrap; gap: 20px;">
-    {% for s in students %}
-    <div style="border: 1px solid #140303; border-radius: 10px; padding: 10px; width: 200px; text-align: center;">
-        {% if s.profile_pic %}
-            <img src="{{ url_for('static', filename='uploads/' + s.profile_pic) }}" 
-                 alt="Profile Pic" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
-        {% else %}
-            <img src="{{ url_for('static', filename='images/default_profile.png') }}" 
-                 alt="Profile Pic" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
-        {% endif %}
-        <h3>{{ s.first_name }} {{ s.second_name or '' }} {{ s.last_name }}</h3>
-        <p>{{ s.gender }}</p>
-        <p>DOB: {{ s.date_of_birth.strftime('%Y-%m-%d') }}</p>
+<div class="dashboard-section">
+    <div class="page-header">
+        <h1>Students in {{ grade_level }}</h1>
+        <p class="student-count">{{ students|length }} student{% if students|length != 1 %}s{% endif %} found</p>
     </div>
-    {% endfor %}
-</div>
 
-<p>
-    <a href="{{ url_for('grade_levels') }}">Back to Grade Levels</a> |
-    <a href="{{ url_for('home') }}">Back to Home</a>
-</p>
+    <div class="students-grid">
+        {% for s in students %}
+        <div class="student-card">
+            <div class="student-avatar">
+                {% if s.profile_pic %}
+                    <img src="{{ get_profile_pic_url(s.profile_pic) }}" alt="{{ s.first_name }}">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        {{ s.first_name[0] }}{{ s.last_name[0] }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="student-info">
+                <h3>{{ s.first_name }} {{ s.last_name }}</h3>
+                {% if s.second_name %}
+                <p class="second-name">{{ s.second_name }}</p>
+                {% endif %}
+                <p class="gender">{{ s.gender }}</p>
+                <p class="dob">Born {{ s.date_of_birth.strftime('%b %d, %Y') }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="navigation-links">
+        <a href="{{ url_for('grade_levels') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Grade Levels
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-outline">
+            <i class="fas fa-home"></i>
+            Back to Home
+        </a>
+    </div>
+</div>
 {% endblock %}

@@ -1,53 +1,142 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>All Courses</h1>
+<div class="dashboard-section">
+    <!-- Header Section -->
+    <div class="courses-header">
+        <div class="header-content">
+            <h1>Course Catalog</h1>
+            <p>Manage and browse all available courses</p>
+        </div>
+        {% if current_user.role in ['admin', 'teacher'] %}
+        <a href="{{ url_for('add_course') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+            Add New Course
+        </a>
+        {% endif %}
+    </div>
 
-<input type="text" id="searchInput" placeholder="Search courses...">
+    <!-- Search and Stats -->
+    <div class="courses-controls">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search courses by name...">
+        </div>
+        <div class="courses-stats">
+            <span class="stat">
+                <strong>{{ courses|length }}</strong> Total Courses
+            </span>
+            <span class="stat">
+                <strong>{{ courses|sum(attribute='credit') }}</strong> Total Credits
+            </span>
+        </div>
+    </div>
 
-<p>
-    <a href="{{ url_for('add_course') }}">Add Course</a>
-</p>
+    <!-- Courses Table -->
+    <div class="table-container">
+        {% if courses %}
+        <table id="coursesTable" class="data-table">
+            <thead>
+                <tr>
+                    <th>
+                        <i class="fas fa-book"></i>
+                        Course Name
+                    </th>
+                    <th>
+                        <i class="fas fa-clock"></i>
+                        Credits
+                    </th>
+                    <th>
+                        <i class="fas fa-cog"></i>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for course in courses %}
+                <tr>
+                    <td class="course-name">
+                        <div class="course-info">
+                            <strong>{{ course.course_name }}</strong>
+                            <span class="course-id">ID: {{ course.id }}</span>
+                        </div>
+                    </td>
+                    <td class="credits">
+                        <span class="credit-badge">{{ course.credit }}</span>
+                    </td>
+                    <td class="actions">
+                        {% if current_user.role in ['admin', 'teacher'] %}
+                        <form action="{{ url_for('delete_course', course_id=course.id) }}" method="post" class="delete-form">
+                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Are you sure you want to delete {{ course.course_name }}?')">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="no-actions">View Only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <h3>No Courses Available</h3>
+            <p>There are no courses in the catalog yet.</p>
+            {% if current_user.role in ['admin', 'teacher'] %}
+            <a href="{{ url_for('add_course') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i>
+                Add First Course
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 
-<table id="coursesTable" border="1" cellpadding="5" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Course Name</th>
-            <th>Credit(s)</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for c in courses %}
-        <tr>
-            <td>{{ c.course_name }}</td>
-            <td>{{ c.credit }}</td>
-            <td>
-                <form action="{{ url_for('delete_course', course_id=c.id) }}" method="post" style="display:inline;">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-<p>
-    <a href="{{ url_for('home') }}">Back to Home</a>
-</p>
+    <!-- Back to Home -->
+    <div class="action-buttons">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+</div>
 
 <script>
-const searchInput = document.getElementById('searchInput');
-const table = document.getElementById('coursesTable');
-const rows = Array.from(table.getElementsByTagName('tr')).slice(1); // skip header
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('coursesTable');
+    
+    if (searchInput && table) {
+        const rows = Array.from(table.getElementsByTagName('tbody')[0].getElementsByTagName('tr'));
 
-searchInput.addEventListener('input', function() {
-    const filter = searchInput.value.toLowerCase();
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter) ? '' : 'none';
-    });
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+
+        // Add focus style to search
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    }
 });
-</script>
 
+// Enhanced delete confirmation
+function confirmDelete(courseName) {
+    return confirm(`Are you sure you want to delete "${courseName}"? This action cannot be undone.`);
+}
+</script>
 {% endblock %}

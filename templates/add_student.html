@@ -1,46 +1,256 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Add New Student (Admin Only)</h1>
+<div class="dashboard-section">
+    <!-- Header Section -->
+    <div class="form-header">
+        <h1>Add New Student</h1>
+        <p>Register a new student to the NiA School system</p>
+        <div class="admin-badge">
+            <i class="fas fa-shield-alt"></i>
+            Admin Access Required
+        </div>
+    </div>
 
-<form method="post" enctype="multipart/form-data" action="{{ url_for('add_student') }}">
-    <p>
-        <label>First Name:</label>
-        <input type="text" name="first_name" required>
-    </p>
-    <p>
-        <label>Second Name:</label>
-        <input type="text" name="second_name">
-    </p>
-    <p>
-        <label>Last Name:</label>
-        <input type="text" name="last_name" required>
-    </p>
-    <p>
-        <label>Gender:</label>
-        <select name="gender" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select>
-    </p>
-    <p>
-        <label>Date of Birth:</label>
-        <input type="date" name="date_of_birth" required>
-    </p>
-    <p>
-        <label>Grade Level:</label>
-        <input type="text" name="grade_level">
-    </p>
-    <p>
-        <label>Profile Picture:</label>
-        <input type="file" name="profile_pic" accept="image/*">
-    </p>
-    <p>
-        <button type="submit">Add Student</button>
-    </p>
-</form>
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_student') }}" class="student-form">
+            <!-- Personal Information Section -->
+            <div class="form-section">
+                <h3>
+                    <i class="fas fa-user-graduate"></i>
+                    Personal Information
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">
+                            <i class="fas fa-signature"></i>
+                            First Name *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="first_name" 
+                            name="first_name" 
+                            placeholder="Enter first name"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">
+                            <i class="fas fa-signature"></i>
+                            Last Name *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="last_name" 
+                            name="last_name" 
+                            placeholder="Enter last name"
+                            required
+                        >
+                    </div>
+                </div>
 
-<p>
-    <a href="{{ url_for('students') }}">Back to Student List</a>
-</p>
+                <div class="form-group">
+                    <label for="second_name">
+                        <i class="fas fa-signature"></i>
+                        Second Name (Optional)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="second_name" 
+                        name="second_name" 
+                        placeholder="Enter middle or second name"
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gender">
+                            <i class="fas fa-venus-mars"></i>
+                            Gender *
+                        </label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date_of_birth">
+                            <i class="fas fa-calendar-alt"></i>
+                            Date of Birth *
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date_of_birth" 
+                            name="date_of_birth" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="grade_level">
+                        <i class="fas fa-graduation-cap"></i>
+                        Grade Level
+                    </label>
+                    <select id="grade_level" name="grade_level">
+                        <option value="">Select Grade Level</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 11">Grade 11</option>
+                        <option value="Grade 12">Grade 12</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Profile Picture Section -->
+            <div class="form-section">
+                <h3>
+                    <i class="fas fa-camera"></i>
+                    Profile Picture
+                </h3>
+                <div class="form-group">
+                    <label for="profile_pic">
+                        <i class="fas fa-upload"></i>
+                        Upload Profile Picture
+                    </label>
+                    <input 
+                        type="file" 
+                        id="profile_pic" 
+                        name="profile_pic" 
+                        accept="image/*"
+                        class="file-input"
+                    >
+                    <div class="file-info">
+                        <i class="fas fa-info-circle"></i>
+                        Supported formats: JPG, PNG, GIF | Maximum size: 16MB
+                    </div>
+                </div>
+                
+                <!-- Image Preview -->
+                <div class="image-preview" id="imagePreview">
+                    <div class="preview-placeholder">
+                        <i class="fas fa-user"></i>
+                        <p>Image preview will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Account Linking (if users are available) -->
+            {% if users %}
+            <div class="form-section">
+                <h3>
+                    <i class="fas fa-link"></i>
+                    Account Linking
+                </h3>
+                <div class="form-group">
+                    <label for="user_id">
+                        <i class="fas fa-user-circle"></i>
+                        Link to Existing User Account (Optional)
+                    </label>
+                    <select id="user_id" name="user_id">
+                        <option value="">Select User Account</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }} ({{ user.role }})</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-hint">
+                        Link this student profile to an existing user account
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <i class="fas fa-user-plus"></i>
+                    Add Student
+                </button>
+                <a href="{{ url_for('students') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Students
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Quick Tips Section -->
+    <div class="tips-section">
+        <h3><i class="fas fa-lightbulb"></i> Student Registration Tips</h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <i class="fas fa-id-card"></i>
+                <h4>Complete Information</h4>
+                <p>Ensure all required fields are filled accurately for proper student records.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-image"></i>
+                <h4>Profile Photos</h4>
+                <p>Use clear, recent photos for easy identification and better user experience.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h4>Grade Placement</h4>
+                <p>Assign appropriate grade levels for proper academic tracking and reporting.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Image preview functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const profilePicInput = document.getElementById('profile_pic');
+    const imagePreview = document.getElementById('imagePreview');
+
+    if (profilePicInput && imagePreview) {
+        profilePicInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.addEventListener('load', function() {
+                    imagePreview.innerHTML = `
+                        <div class="preview-image">
+                            <img src="${reader.result}" alt="Preview">
+                            <button type="button" class="remove-image" onclick="clearImage()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+function clearImage() {
+    const profilePicInput = document.getElementById('profile_pic');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    profilePicInput.value = '';
+    imagePreview.innerHTML = `
+        <div class="preview-placeholder">
+            <i class="fas fa-user"></i>
+            <p>Image preview will appear here</p>
+        </div>
+    `;
+}
+
+// Form validation
+document.querySelector('.student-form').addEventListener('submit', function(e) {
+    const firstName = document.getElementById('first_name').value.trim();
+    const lastName = document.getElementById('last_name').value.trim();
+    const dob = document.getElementById('date_of_birth').value;
+    
+    if (!firstName || !lastName || !dob) {
+        e.preventDefault();
+        alert('Please fill in all required fields marked with *');
+    }
+});
+</script>
 {% endblock %}

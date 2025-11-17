@@ -1,31 +1,152 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>All Students</h1>
+<div class="dashboard-section">
+    <!-- Header Section -->
+    <div class="students-header">
+        <div class="header-content">
+            <h1>Student Directory</h1>
+            <p>Manage and browse all student records</p>
+        </div>
+        {% if current_user.role in ['admin', 'teacher'] %}
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i>
+            Add New Student
+        </a>
+        {% endif %}
+    </div>
 
-<input type="text" id="searchInput" placeholder="Search students...">
+    <!-- Search and Stats -->
+    <div class="students-controls">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search students by name, grade, or gender...">
+        </div>
+        <div class="students-stats">
+            <span class="stat">
+                <strong>{{ students|length }}</strong> Total Students
+            </span>
+            <span class="stat">
+                <strong>{{ students|selectattr('gender', 'equalto', 'Male')|list|length }}</strong> Male
+            </span>
+            <span class="stat">
+                <strong>{{ students|selectattr('gender', 'equalto', 'Female')|list|length }}</strong> Female
+            </span>
+        </div>
+    </div>
 
-<p>
-    <a href="{{ url_for('add_student') }}">Add Student</a>
-</p>
+    <!-- Students List -->
+    <div class="students-container">
+        {% if students %}
+        <div class="students-grid" id="studentsList">
+            {% for student in students %}
+            <div class="student-card" data-search="{{ student.first_name.lower() }} {{ student.last_name.lower() }} {{ student.grade_level.lower() }} {{ student.gender.lower() }}">
+                <div class="student-header">
+                    {% if student.profile_pic %}
+                    <img src="{{ get_profile_pic_url(student.profile_pic) }}" alt="{{ student.first_name }}" class="student-avatar">
+                    {% else %}
+                    <div class="student-avatar placeholder">
+                        {{ student.first_name[0] }}{{ student.last_name[0] }}
+                    </div>
+                    {% endif %}
+                    <div class="student-info">
+                        <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                        <p class="student-grade">{{ student.grade_level }}</p>
+                    </div>
+                </div>
+                
+                <div class="student-details">
+                    <div class="detail-item">
+                        <i class="fas fa-venus-mars"></i>
+                        <span>{{ student.gender }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>{{ student.date_of_birth.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    {% if student.second_name %}
+                    <div class="detail-item">
+                        <i class="fas fa-signature"></i>
+                        <span>{{ student.second_name }}</span>
+                    </div>
+                    {% endif %}
+                </div>
 
-<ul id="studentsList">
-{% for s in students %}
-   <li>
-      {{ s.first_name }} {{ s.last_name }} - {{ s.gender }}
-      <form action="{{ url_for('delete_student', student_id=s.id) }}" method="post" style="display:inline;">
-          <button type="submit">Delete</button>
-      </form>
-   </li>
-{% endfor %}
-</ul>
+                <div class="student-actions">
+                    {% if current_user.role == 'admin' %}
+                    <form action="{{ url_for('delete_student', student_id=student.id) }}" method="post" class="delete-form">
+                        <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Are you sure you want to delete {{ student.first_name }} {{ student.last_name }}?')">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                    {% endif %}
+                    <a href="#" class="btn btn-outline btn-small view-profile-btn">
+                        <i class="fas fa-eye"></i>
+                        View Profile
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>No Students Found</h3>
+            <p>There are no students in the system yet.</p>
+            {% if current_user.role in ['admin', 'teacher'] %}
+            <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Add First Student
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 
-<p>
-    <a href="{{ url_for('home') }}">Back to Home</a>
-</p>
+    <!-- Back to Home -->
+    <div class="action-buttons">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+</div>
 
-<script src="{{url_for('static',filename='js/logic.js')}}">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const studentCards = document.querySelectorAll('.student-card');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase();
+            studentCards.forEach(card => {
+                const searchData = card.getAttribute('data-search');
+                card.style.display = searchData.includes(filter) ? 'block' : 'none';
+            });
+        });
 
+        // Add focus style to search
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    }
+
+    // View profile button functionality
+    document.querySelectorAll('.view-profile-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Student profile view feature coming soon!');
+        });
+    });
+});
 </script>
-
 {% endblock %}

@@ -1,19 +1,148 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Grade Levels</h1>
+<div class="dashboard-section">
+   
+    <div class="grades-header">
+        <div class="header-content">
+            <h1>Grade Levels</h1>
+            <p>Browse students organized by grade levels</p>
+        </div>
+        <div class="grades-stats">
+            <div class="stat-card">
+                <i class="fas fa-layer-group"></i>
+                <div class="stat-info">
+                    <h3>{{ grades|length }}</h3>
+                    <p>Grade Levels</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<ul>
-    {% for grade in grades %}
-        <li>
-            <a href="{{ url_for('students_by_grade', grade_level=grade) }}">
-                Grade {{ grade }}
+    <!-- Grade Levels Grid -->
+    <div class="grades-container">
+        {% if grades %}
+        <div class="grades-grid">
+            {% for grade in grades %}
+            <a href="{{ url_for('students_by_grade', grade_level=grade) }}" class="grade-card">
+                <div class="grade-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="grade-content">
+                    <h3>Grade {{ grade }}</h3>
+                    <p class="grade-description">
+                        {% if grade == "Grade 9" %}
+                        Freshman Year
+                        {% elif grade == "Grade 10" %}
+                        Sophomore Year
+                        {% elif grade == "Grade 11" %}
+                        Junior Year
+                        {% elif grade == "Grade 12" %}
+                        Senior Year
+                        {% else %}
+                        Student Level
+                        {% endif %}
+                    </p>
+                    <div class="grade-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-users"></i>
+                            View Students
+                        </span>
+                    </div>
+                </div>
+                <div class="grade-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
             </a>
-        </li>
-    {% endfor %}
-</ul>
+            {% endfor %}
+        </div>
 
-<p>
-    <a href="{{ url_for('home') }}">Back to Home</a>
-</p>
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            <div class="actions-grid">
+                <a href="{{ url_for('students') }}" class="action-card">
+                    <i class="fas fa-users"></i>
+                    <span>View All Students</span>
+                </a>
+                <a href="{{ url_for('show_courses') }}" class="action-card">
+                    <i class="fas fa-book"></i>
+                    <span>Browse Courses</span>
+                </a>
+                {% if current_user.role in ['admin', 'teacher'] %}
+                <a href="{{ url_for('add_student') }}" class="action-card">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add New Student</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>No Grade Levels Found</h3>
+            <p>There are no students organized by grade levels yet.</p>
+            {% if current_user.role in ['admin', 'teacher'] %}
+            <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Add First Student
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Back to Home -->
+    <div class="action-buttons">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+</div>
+
+
+<div class="modal" id="gradeInfoModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Grade Level Information</h3>
+        <div id="gradeInfoContent">
+            
+        </div>
+    </div>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const gradeCards = document.querySelectorAll('.grade-card');
+    
+    gradeCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // For future: Show grade level statistics
+            console.log('Navigating to grade:', this.querySelector('h3').textContent);
+        });
+    });
+
+    // Add hover effects
+    gradeCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+
+function showGradeInfo(grade) {
+    
+    console.log('Showing info for:', grade);
+}
+</script>
 {% endblock %}
