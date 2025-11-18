@@ -422,14 +422,7 @@ def students_by_grade(grade_level):
     students = Student.query.filter_by(grade_level=grade_level).all()
     return render_template('students_by_grade.html', grade_level=grade_level, students=students)
 
-# Error handlers
-@app.errorhandler(403)
-def forbidden(error):
-    return render_template('403.html'), 403
 
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('404.html'), 404
 
 if __name__ == "__main__":
     with app.app_context():
